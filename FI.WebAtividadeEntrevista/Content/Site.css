@@ -8,3 +8,21 @@
     padding-left: 15px;
     padding-right: 15px;
 }
+
+.beneficiario-modal-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 1em;
+}
+
+.beneficiario-input-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.beneficiario-incluir-button {
+    align-self: flex-end;
+    height: 34px;
+    width: 40%
+}

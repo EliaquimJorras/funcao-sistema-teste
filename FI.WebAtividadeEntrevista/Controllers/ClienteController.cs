@@ -154,5 +154,11 @@ namespace WebAtividadeEntrevista.Controllers
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
         }
+
+        [HttpPost]
+        public ActionResult MostarBeneficiarioPopUp(long id)
+        {
+            return PartialView("~/Views/Beneficiarios/BeneficiariosPopUp.cshtml");
+        }
     }
 }

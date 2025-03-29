@@ -80,12 +80,16 @@
 
     <div class="row">
         <div class="col-lg-12">
+            <div class="pull-left">
+                <button type="button" id="beneficiario-modal" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalBeneficiarios">Beneficiários</button>
+            </div>
+
             <div class="pull-right">
                 <button type="submit" class="btn btn-sm btn-success">Salvar</button>
                 @Html.ActionLink("Voltar", "Index", "Cliente", new { }, new { @class = "btn btn-sm btn-danger" })
             </div>
         </div>
     </div>
-
-
 </form>
+
+<div id="modal-container"></div>
