@@ -3,8 +3,9 @@
     ViewBag.Title = "Cadastrar Cliente";
 }
 @section scripts{
-    <script> var urlPost = '@Url.Action("Incluir", "Cliente", new { area = "" })'; </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        var urlPost = '@Url.Action("Incluir", "Cliente", new { area = "" })';
+    </script>
     @Scripts.Render("~/bundles/clientes")
 }
 <h2>@Html.Raw(ViewBag.Title)</h2>
