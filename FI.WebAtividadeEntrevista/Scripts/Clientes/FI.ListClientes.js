@@ -14,14 +14,23 @@ $(document).ready(function () {
             fields: {
                 Nome: {
                     title: 'Nome',
-                    width: '50%'
+                    width: '40%',
+                },
+                CPF: {
+                    title: 'CPF',
+                    width: '25%',
+                    sorting: false,
+                    display: function (data) {
+                        return formatarCPF(data.record.CPF);
+                    }
                 },
                 Email: {
                     title: 'Email',
-                    width: '35%'
+                    width: '30%'
                 },
                 Alterar: {
-                    title: '',
+                    title: 'Ação',
+                    sorting: false,
                     display: function (data) {
                         return '<button onclick="window.location.href=\'' + urlAlteracao + '/' + data.record.Id + '\'" class="btn btn-primary btn-sm">Alterar</button>';
                     }
@@ -33,3 +42,11 @@ $(document).ready(function () {
     if (document.getElementById("gridClientes"))
         $('#gridClientes').jtable('load');
 })
+
+function formatarCPF(cpf) {
+    // Remove caracteres não numéricos
+    cpf = cpf.replace(/\D/g, '');
+
+    // Aplica a máscara no CPF (###.###.###-##)
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+}

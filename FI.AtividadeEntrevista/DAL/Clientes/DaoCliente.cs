@@ -139,29 +139,25 @@ namespace FI.AtividadeEntrevista.DAL
             base.Executar("FI_SP_DelCliente", parametros);
         }
 
-        private List<DML.Cliente> Converter(DataSet ds)
+        private List<Cliente> Converter(DataSet ds)
         {
-            List<DML.Cliente> lista = new List<DML.Cliente>();
-            if (ds != null && ds.Tables != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-            {
-                foreach (DataRow row in ds.Tables[0].Rows)
-                {
-                    DML.Cliente cli = new DML.Cliente();
-                    cli.Id = row.Field<long>("Id");
-                    cli.CEP = row.Field<string>("CEP");
-                    cli.Cidade = row.Field<string>("Cidade");
-                    cli.Email = row.Field<string>("Email");
-                    cli.Estado = row.Field<string>("Estado");
-                    cli.Logradouro = row.Field<string>("Logradouro");
-                    cli.Nacionalidade = row.Field<string>("Nacionalidade");
-                    cli.Nome = row.Field<string>("Nome");
-                    cli.Sobrenome = row.Field<string>("Sobrenome");
-                    cli.Telefone = row.Field<string>("Telefone");
-                    lista.Add(cli);
-                }
-            }
+            if (ds?.Tables == null || ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+                return new List<Cliente>();
 
-            return lista;
+            return ds.Tables[0].AsEnumerable().Select(row => new Cliente
+            {
+                Id = row.Field<long>("Id"),
+                CEP = row.Field<string>("CEP"),
+                Cidade = row.Field<string>("Cidade"),
+                Email = row.Field<string>("Email"),
+                Estado = row.Field<string>("Estado"),
+                Logradouro = row.Field<string>("Logradouro"),
+                Nacionalidade = row.Field<string>("Nacionalidade"),
+                Nome = row.Field<string>("Nome"),
+                Sobrenome = row.Field<string>("Sobrenome"),
+                Telefone = row.Field<string>("Telefone"),
+                CPF = row.Field<string>("CPF")
+            }).ToList();
         }
     }
 }
