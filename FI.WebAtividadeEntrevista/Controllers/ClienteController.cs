@@ -1,5 +1,6 @@
 ﻿using FI.AtividadeEntrevista.BLL;
 using FI.AtividadeEntrevista.DML;
+using FI.WebAtividadeEntrevista.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,8 +62,6 @@ namespace WebAtividadeEntrevista.Controllers
         [HttpPost]
         public JsonResult Alterar(ClienteModel model)
         {
-            BoCliente bo = new BoCliente();
-
             if (!this.ModelState.IsValid)
             {
                 List<string> erros = (from item in ModelState.Values
@@ -72,51 +71,59 @@ namespace WebAtividadeEntrevista.Controllers
                 Response.StatusCode = 400;
                 return Json(string.Join(Environment.NewLine, erros));
             }
-            else
-            {
-                bo.Alterar(new Cliente()
-                {
-                    Id = model.Id,
-                    CEP = model.CEP,
-                    Cidade = model.Cidade,
-                    Email = model.Email,
-                    Estado = model.Estado,
-                    Logradouro = model.Logradouro,
-                    Nacionalidade = model.Nacionalidade,
-                    Nome = model.Nome,
-                    Sobrenome = model.Sobrenome,
-                    Telefone = model.Telefone
-                });
 
-                return Json("Cadastro alterado com sucesso");
+            BoCliente bo = new BoCliente();
+
+            Cliente cliente = bo.Consultar(model.Id);
+
+            if (cliente == null || (cliente.CPF != model.CPF && bo.VerificarExistencia(model.CPF)))
+            {
+                Response.StatusCode = 400;
+                return Json("Não foi possível alterar as informações cadastradas");
             }
+
+            bo.Alterar(new Cliente()
+            {
+                Id = model.Id,
+                CEP = model.CEP,
+                Cidade = model.Cidade,
+                Email = model.Email,
+                Estado = model.Estado,
+                Logradouro = model.Logradouro,
+                Nacionalidade = model.Nacionalidade,
+                Nome = model.Nome,
+                Sobrenome = model.Sobrenome,
+                Telefone = model.Telefone,
+                CPF = model.CPF
+            });
+
+            return Json("Cadastro alterado com sucesso");
         }
 
         [HttpGet]
         public ActionResult Alterar(long id)
         {
             BoCliente bo = new BoCliente();
+
             Cliente cliente = bo.Consultar(id);
-            Models.ClienteModel model = null;
 
-            if (cliente != null)
+            if (cliente == null)
+                return View(model: null);
+
+            ClienteModel model = new ClienteModel()
             {
-                model = new ClienteModel()
-                {
-                    Id = cliente.Id,
-                    CEP = cliente.CEP,
-                    Cidade = cliente.Cidade,
-                    Email = cliente.Email,
-                    Estado = cliente.Estado,
-                    Logradouro = cliente.Logradouro,
-                    Nacionalidade = cliente.Nacionalidade,
-                    Nome = cliente.Nome,
-                    Sobrenome = cliente.Sobrenome,
-                    Telefone = cliente.Telefone
-                };
-
-
-            }
+                Id = cliente.Id,
+                CEP = cliente.CEP,
+                Cidade = cliente.Cidade,
+                Email = cliente.Email,
+                Estado = cliente.Estado,
+                Logradouro = cliente.Logradouro,
+                Nacionalidade = cliente.Nacionalidade,
+                Nome = cliente.Nome,
+                Sobrenome = cliente.Sobrenome,
+                Telefone = cliente.Telefone,
+                CPF = cliente.CPF
+            };
 
             return View(model);
         }
