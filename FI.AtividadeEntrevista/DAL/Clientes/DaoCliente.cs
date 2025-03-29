@@ -1,6 +1,7 @@
 ﻿using FI.AtividadeEntrevista.DML;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace FI.AtividadeEntrevista.DAL
@@ -14,24 +15,29 @@ namespace FI.AtividadeEntrevista.DAL
         /// Inclui um novo cliente
         /// </summary>
         /// <param name="cliente">Objeto de cliente</param>
-        internal long Incluir(DML.Cliente cliente)
+        internal long Incluir(Cliente cliente)
         {
-            List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
-
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Nome", cliente.Nome));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Sobrenome", cliente.Sobrenome));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Nacionalidade", cliente.Nacionalidade));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("CEP", cliente.CEP));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Estado", cliente.Estado));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Cidade", cliente.Cidade));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Logradouro", cliente.Logradouro));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Email", cliente.Email));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Telefone", cliente.Telefone));
+            List<SqlParameter> parametros = new List<SqlParameter>
+            {
+                new SqlParameter("Nome", cliente.Nome),
+                new SqlParameter("Sobrenome", cliente.Sobrenome),
+                new SqlParameter("Nacionalidade", cliente.Nacionalidade),
+                new SqlParameter("CEP", cliente.CEP),
+                new SqlParameter("Estado", cliente.Estado),
+                new SqlParameter("Cidade", cliente.Cidade),
+                new SqlParameter("Logradouro", cliente.Logradouro),
+                new SqlParameter("Email", cliente.Email),
+                new SqlParameter("Telefone", cliente.Telefone),
+                new SqlParameter("CPF", cliente.CPF)
+            };
 
             DataSet ds = base.Consultar("FI_SP_IncClienteV2", parametros);
+
             long ret = 0;
+
             if (ds.Tables[0].Rows.Count > 0)
                 long.TryParse(ds.Tables[0].Rows[0][0].ToString(), out ret);
+
             return ret;
         }
 
@@ -53,9 +59,7 @@ namespace FI.AtividadeEntrevista.DAL
 
         internal bool VerificarExistencia(string CPF)
         {
-            List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
-
-            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", CPF));
+            List<SqlParameter> parametros = new List<SqlParameter> { new SqlParameter("CPF", CPF) };
 
             DataSet ds = base.Consultar("FI_SP_VerificaCliente", parametros);
 
