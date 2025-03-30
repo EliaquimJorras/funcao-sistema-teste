@@ -1,4 +1,6 @@
-﻿<div class="modal" id="modalBeneficiarios" tabindex="-1" role="dialog">
+﻿@model FI.WebAtividadeEntrevista.Models.ListBeneficiarioModels
+
+<div class="modal" id="modalBeneficiarios" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -22,8 +24,19 @@
                         <input type="text" id="nome" class="form-control" placeholder="Ex.: Maria" maxlength="50">
                     </div>
 
-                    <button type="button" class="btn btn-success btn-sm beneficiario-incluir-button">Incluir</button>
+                    <button id="incluir-button" type="button" class="btn btn-success btn-sm beneficiario-incluir-button">Incluir</button>
                 </div>
+            </div>
+
+            <div class="modal-footer">
+                @if (Model == null || Model.BeneficiarioModels.Count == 0)
+                {
+                    <p>Nenhum elemento na lista</p>
+                }
+                else
+                {
+                    <p>Tem N elementos na lista</p>
+                }
             </div>
         </div>
     </div>

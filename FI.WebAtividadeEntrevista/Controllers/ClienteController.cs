@@ -1,11 +1,10 @@
 ﻿using FI.AtividadeEntrevista.BLL;
 using FI.AtividadeEntrevista.DML;
-using FI.WebAtividadeEntrevista.Helpers;
+using FI.WebAtividadeEntrevista.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
-using WebAtividadeEntrevista.Models;
 
 namespace WebAtividadeEntrevista.Controllers
 {
@@ -156,9 +155,25 @@ namespace WebAtividadeEntrevista.Controllers
         }
 
         [HttpPost]
-        public ActionResult MostarBeneficiarioPopUp(long id)
+        public ActionResult MostarBeneficiarioPopUp(long idCliente)
         {
-            return PartialView("~/Views/Beneficiarios/BeneficiariosPopUp.cshtml");
+            BoBeneficiario bo = new BoBeneficiario();
+
+            List<Beneficiario> beneficiarios = bo.ListarBeneficiarios(idCliente);
+
+            ListBeneficiarioModels model = new ListBeneficiarioModels()
+            {
+                IdCliente = idCliente,
+                BeneficiarioModels = beneficiarios.Select(x => new BeneficiarioModel()
+                {
+                    Id = x.Id,
+                    CPF = x.CPF,
+                    IdCliente = x.IdCliente,
+                    Nome = x.Nome
+                }).ToList()
+            };
+
+            return PartialView("~/Views/Beneficiarios/BeneficiariosPopUp.cshtml", model);
         }
     }
 }

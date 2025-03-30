@@ -1,9 +1,8 @@
 ﻿using FI.WebAtividadeEntrevista.Helpers;
 using FI.WebAtividadeEntrevista.Validators;
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 
-namespace WebAtividadeEntrevista.Models
+namespace FI.WebAtividadeEntrevista.Models
 {
     /// <summary>
     /// Classe de Modelo de Cliente

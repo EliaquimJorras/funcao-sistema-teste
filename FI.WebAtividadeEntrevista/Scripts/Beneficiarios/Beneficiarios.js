@@ -3,12 +3,17 @@
         e.preventDefault();
 
         let url = e.currentTarget.baseURI.replace(/(Alterar|Incluir)/, "MostarBeneficiarioPopUp");
+        let lastCaracterURI = url.slice(-1)
+
+        let data = {
+            "IdCliente": Number.isInteger(lastCaracterURI) ? Number(lastCaracterURI) : 0
+        }
 
         $.ajax({
             url: url,
             type: 'POST',
             contentType: "application/json; charset=utf-8",
-            data: null,
+            data: JSON.stringify(data),
             success: function (response) {
                 if (response.Status === undefined) {
                     $('#modal-container').html(response);
