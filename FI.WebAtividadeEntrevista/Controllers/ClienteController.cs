@@ -21,41 +21,66 @@ namespace WebAtividadeEntrevista.Controllers
         }
 
         [HttpPost]
-        public JsonResult Incluir(ClienteModel model)
+        public ActionResult Incluir(ClienteModel model)
         {
-            if (!this.ModelState.IsValid)
+            try
             {
-                List<string> erros = (from item in ModelState.Values
-                                      from error in item.Errors
-                                      select error.ErrorMessage).ToList();
+                if (!this.ModelState.IsValid)
+                {
+                    List<string> erros = (from item in ModelState.Values
+                                          from error in item.Errors
+                                          select error.ErrorMessage).ToList();
 
-                Response.StatusCode = 400;
-                return Json(string.Join(Environment.NewLine, erros));
+                    Response.StatusCode = 400;
+                    return Json(string.Join(Environment.NewLine, erros));
+                }
+
+                BoCliente bo = new BoCliente();
+
+                if (bo.VerificarExistencia(model.CPF))
+                {
+                    Response.StatusCode = 400;
+                    return Json("CPF já cadastrado");
+                }
+
+                model.Id = bo.Incluir(new Cliente()
+                {
+                    CEP = model.CEP,
+                    Cidade = model.Cidade,
+                    Email = model.Email,
+                    Estado = model.Estado,
+                    Logradouro = model.Logradouro,
+                    Nacionalidade = model.Nacionalidade,
+                    Nome = model.Nome,
+                    Sobrenome = model.Sobrenome,
+                    Telefone = model.Telefone,
+                    CPF = model.CPF
+                });
+
+                if (model.BeneficiarioModels?.Count > 0)
+                {
+                    BoBeneficiario boBeneficiario = new BoBeneficiario();
+
+                    foreach (BeneficiarioModel beneficiario in model.BeneficiarioModels)
+                    {
+                        if (beneficiario == null) continue;
+
+                        beneficiario.Id = boBeneficiario.Incluir(new Beneficiario()
+                        {
+                            Nome = beneficiario.Nome,
+                            CPF = beneficiario.CPF,
+                            IdCliente = model.Id
+                        });
+                    }
+                }
+
+                return Json(new { Result = "OK", Message = "Cadastro efetuado com sucesso", BeneficiarioModels = model.BeneficiarioModels });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "ERROR", Message = ex.Message });
             }
 
-            BoCliente bo = new BoCliente();
-
-            if (bo.VerificarExistencia(model.CPF))
-            {
-                Response.StatusCode = 400;
-                return Json("CPF já cadastrado");
-            }
-
-            model.Id = bo.Incluir(new Cliente()
-            {
-                CEP = model.CEP,
-                Cidade = model.Cidade,
-                Email = model.Email,
-                Estado = model.Estado,
-                Logradouro = model.Logradouro,
-                Nacionalidade = model.Nacionalidade,
-                Nome = model.Nome,
-                Sobrenome = model.Sobrenome,
-                Telefone = model.Telefone,
-                CPF = model.CPF
-            });
-
-            return Json("Cadastro efetuado com sucesso");
         }
 
         [HttpPost]
@@ -109,6 +134,14 @@ namespace WebAtividadeEntrevista.Controllers
             if (cliente == null)
                 return View(model: null);
 
+            List<BeneficiarioModel> beneficiarioModels = new BoBeneficiario().ListarBeneficiarios(id).Select(x => new BeneficiarioModel()
+            {
+                Id = x.Id,
+                CPF = x.CPF,
+                Nome = x.Nome,
+                IdCliente = x.IdCliente
+            }).ToList();
+
             ClienteModel model = new ClienteModel()
             {
                 Id = cliente.Id,
@@ -121,7 +154,8 @@ namespace WebAtividadeEntrevista.Controllers
                 Nome = cliente.Nome,
                 Sobrenome = cliente.Sobrenome,
                 Telefone = cliente.Telefone,
-                CPF = cliente.CPF
+                CPF = cliente.CPF,
+                BeneficiarioModels = beneficiarioModels
             };
 
             return View(model);
@@ -155,25 +189,9 @@ namespace WebAtividadeEntrevista.Controllers
         }
 
         [HttpPost]
-        public ActionResult MostarBeneficiarioPopUp(long idCliente)
+        public ActionResult MostarBeneficiarioPopUp()
         {
-            BoBeneficiario bo = new BoBeneficiario();
-
-            List<Beneficiario> beneficiarios = bo.ListarBeneficiarios(idCliente);
-
-            ListBeneficiarioModels model = new ListBeneficiarioModels()
-            {
-                IdCliente = idCliente,
-                BeneficiarioModels = beneficiarios.Select(x => new BeneficiarioModel()
-                {
-                    Id = x.Id,
-                    CPF = x.CPF,
-                    IdCliente = x.IdCliente,
-                    Nome = x.Nome
-                }).ToList()
-            };
-
-            return PartialView("~/Views/Beneficiarios/BeneficiariosPopUp.cshtml", model);
+            return PartialView("~/Views/Beneficiarios/BeneficiariosPopUp.cshtml");
         }
     }
 }

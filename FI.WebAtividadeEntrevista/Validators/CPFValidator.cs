@@ -8,11 +8,20 @@ namespace FI.WebAtividadeEntrevista.Validators
         public override bool IsValid(object value)
         {
             if (value == null || string.IsNullOrEmpty(value.ToString()))
+            {
+                ErrorMessage = "O CPF não pode estar vazio.";
                 return false;
+            }
 
             string cpf = Utils.RemoveNaoNumericos(value.ToString());
 
-            return cpf.Length == 11 && ValidaCPF(cpf);
+            if (cpf.Length != 11 || !ValidaCPF(cpf))
+            {
+                ErrorMessage = $"O CPF '{value}' informado é inválido. <br>";
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>

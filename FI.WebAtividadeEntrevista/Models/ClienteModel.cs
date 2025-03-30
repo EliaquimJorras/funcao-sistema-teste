@@ -1,5 +1,6 @@
 ﻿using FI.WebAtividadeEntrevista.Helpers;
 using FI.WebAtividadeEntrevista.Validators;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace FI.WebAtividadeEntrevista.Models
@@ -71,11 +72,13 @@ namespace FI.WebAtividadeEntrevista.Models
         /// CPF
         /// </summary>
         [Required]
-        [CPFValidator(ErrorMessage = "O CPF informado é inválido")]
+        [CPFValidator]
         public string CPF
         {
             get => _cpf;
             set => _cpf = Utils.RemoveNaoNumericos(value);
         }
+
+        public List<BeneficiarioModel> BeneficiarioModels { get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace FI.WebAtividadeEntrevista.Models
         private string _cpf;
 
         [Required]
-        [CPFValidator(ErrorMessage = "O CPF informado é inválido")]
+        [CPFValidator]
         public string CPF
         {
             get => _cpf;

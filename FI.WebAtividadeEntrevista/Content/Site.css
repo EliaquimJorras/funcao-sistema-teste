@@ -27,46 +27,45 @@
     width: 40%
 }
 
-thead {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-color: #ffffff;
-}
 
-.table-container {
+.modal-body .table-container {
     overflow-x: auto;
-    max-height: 400px;
     scrollbar-width: none;
+    max-height: 400px;
 }
 
-.table {
+.modal-body .table {
     width: 100%;
     table-layout: auto;
 }
 
-.nome-cell {
+.modal-body thead {
+    position: sticky;
+    top: -1px;
+    z-index: 1;
+    background-color: #ffffff;
+}
+
+.modal-body tbody {
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.modal-body th,
+.modal-body td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.modal-body .nome-cell {
     max-width: 150px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-tbody {
-    display: block;
-    max-height: 300px;
-    overflow-y: auto;
-    scrollbar-width: none;
-}
-
-tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-}
-
-th, td {
-    padding: 8px;
-    text-align: left;
-    border: 1px solid #ddd;
+.modal-body tr:hover {
+    background-color: #f9f9f9;
 }
