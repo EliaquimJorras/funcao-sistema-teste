@@ -26,3 +26,47 @@
     height: 34px;
     width: 40%
 }
+
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #ffffff;
+}
+
+.table-container {
+    overflow-x: auto;
+    max-height: 400px;
+    scrollbar-width: none;
+}
+
+.table {
+    width: 100%;
+    table-layout: auto;
+}
+
+.nome-cell {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+tbody {
+    display: block;
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
