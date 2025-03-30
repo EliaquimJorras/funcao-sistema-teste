@@ -1,7 +1,9 @@
 ﻿
 $(document).ready(function () {
 
-    if (document.getElementById("gridClientes"))
+    if (document.getElementById("gridClientes")) {
+        localStorage.removeItem("beneficiario-list");
+
         $('#gridClientes').jtable({
             title: 'Clientes',
             paging: true, //Enable paging
@@ -37,6 +39,8 @@ $(document).ready(function () {
                 }
             }
         });
+    }
+
 
     //Load student list from server
     if (document.getElementById("gridClientes"))

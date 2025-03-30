@@ -11,6 +11,7 @@ $(document).ready(function () {
         $('#formCadastro #Logradouro').val(obj.Logradouro);
         $('#formCadastro #Telefone').val(obj.Telefone);
         $('#formCadastro #CPF').val(formatarCPF(obj.CPF));
+        localStorage.setItem("beneficiario-list", JSON.stringify(obj.BeneficiarioModels));
     }
 
     $('#CPF').mask('000.000.000-00');
