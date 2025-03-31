@@ -58,7 +58,22 @@ namespace WebAtividadeEntrevista.Controllers
                     CPF = model.CPF
                 });
 
-                ProcessarBeneficiario(model);
+                if (model.BeneficiarioModels != null && model.BeneficiarioModels.Count > 0)
+                {
+                    BoBeneficiario boBeneficiario = new BoBeneficiario();
+
+                    foreach (BeneficiarioModel beneficiario in model.BeneficiarioModels)
+                    {
+                        if (beneficiario == null) continue;
+
+                        beneficiario.Id = boBeneficiario.Incluir(new Beneficiario()
+                        {
+                            Nome = beneficiario.Nome,
+                            CPF = beneficiario.CPF,
+                            IdCliente = model.Id
+                        });
+                    }
+                }
 
                 return Json(new { Result = "OK", Message = "Cadastro efetuado com sucesso", BeneficiarioModels = model.BeneficiarioModels });
             }
@@ -109,8 +124,6 @@ namespace WebAtividadeEntrevista.Controllers
                     CPF = model.CPF
                 });
 
-                ProcessarBeneficiario(model, alterarCliente: true);
-
                 return Json(new { Result = "OK", Message = "Cadastro alterado com sucesso" });
             }
             catch (Exception ex)
@@ -129,14 +142,6 @@ namespace WebAtividadeEntrevista.Controllers
             if (cliente == null)
                 return View(model: null);
 
-            List<BeneficiarioModel> beneficiarioModels = new BoBeneficiario().ListarBeneficiarios(id).Select(x => new BeneficiarioModel()
-            {
-                Id = x.Id,
-                CPF = x.CPF,
-                Nome = x.Nome,
-                IdCliente = x.IdCliente
-            }).ToList();
-
             ClienteModel model = new ClienteModel()
             {
                 Id = cliente.Id,
@@ -150,7 +155,7 @@ namespace WebAtividadeEntrevista.Controllers
                 Sobrenome = cliente.Sobrenome,
                 Telefone = cliente.Telefone,
                 CPF = cliente.CPF,
-                BeneficiarioModels = beneficiarioModels
+                BeneficiarioModels = GetBeneficiarioModels(id)
             };
 
             return View(model);
@@ -189,40 +194,8 @@ namespace WebAtividadeEntrevista.Controllers
             return PartialView("~/Views/Beneficiarios/BeneficiariosPopUp.cshtml");
         }
 
-        private static void ProcessarBeneficiario(ClienteModel model, bool alterarCliente = false)
-        {
-            if (model.BeneficiarioModels == null || model.BeneficiarioModels.Count <= 0) return;
-
-            BoBeneficiario boBeneficiario = new BoBeneficiario();
-
-            foreach (BeneficiarioModel beneficiario in model.BeneficiarioModels)
-            {
-                if (beneficiario == null) continue;
-
-                if (alterarCliente && boBeneficiario.VerificarExistencia(beneficiario.CPF))
-                {
-                    boBeneficiario.Alterar(new Beneficiario()
-                    {
-                        Id = beneficiario.Id,
-                        Nome = beneficiario.Nome,
-                        CPF = beneficiario.CPF,
-                        IdCliente = model.Id
-                    });
-                }
-                else
-                {
-                    beneficiario.Id = boBeneficiario.Incluir(new Beneficiario()
-                    {
-                        Nome = beneficiario.Nome,
-                        CPF = beneficiario.CPF,
-                        IdCliente = model.Id
-                    });
-                }
-            }
-        }
-
         [HttpPost]
-        public ActionResult ExcluirBeneficiario(long id)
+        public ActionResult ExcluirBeneficiario(long id, long idCliente)
         {
             try
             {
@@ -230,12 +203,60 @@ namespace WebAtividadeEntrevista.Controllers
 
                 boBeneficiario.Excluir(id);
 
+                if (idCliente > 0)
+                {
+                    List<BeneficiarioModel> beneficiarioModels = GetBeneficiarioModels(idCliente);
+
+                    return Json(new { Result = "OK", Message = "Beneficiário excluído com sucesso!", BeneficiarioModels = beneficiarioModels });
+                }
+
                 return Json(new { Result = "OK", Message = "Beneficiário excluído com sucesso!" });
             }
             catch (Exception ex)
             {
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
+        }
+
+        [HttpPost]
+        public ActionResult ProcessarBeneficiario(BeneficiarioModel beneficiarioModel)
+        {
+            try
+            {
+                BoBeneficiario boBeneficiario = new BoBeneficiario();
+
+                Beneficiario beneficiario = new Beneficiario
+                {
+                    Id = beneficiarioModel.Id,
+                    Nome = beneficiarioModel.Nome,
+                    CPF = beneficiarioModel.CPF,
+                    IdCliente = beneficiarioModel.IdCliente
+                };
+
+                if (boBeneficiario.VerificarExistencia(beneficiario.CPF))
+                    boBeneficiario.Alterar(beneficiario);
+                else
+                    boBeneficiario.Incluir(beneficiario);
+
+                List<BeneficiarioModel> beneficiarioModels = GetBeneficiarioModels(beneficiarioModel.IdCliente);
+
+                return Json(new { Result = "OK", Message = "Beneficiário salvo com sucesso!", BeneficiarioModels = beneficiarioModels });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "ERROR", Message = ex.Message });
+            }
+        }
+
+        private static List<BeneficiarioModel> GetBeneficiarioModels(long idCliente)
+        {
+            return new BoBeneficiario().ListarBeneficiarios(idCliente).Select(x => new BeneficiarioModel()
+            {
+                Id = x.Id,
+                CPF = x.CPF,
+                Nome = x.Nome,
+                IdCliente = x.IdCliente
+            }).ToList();
         }
     }
 }

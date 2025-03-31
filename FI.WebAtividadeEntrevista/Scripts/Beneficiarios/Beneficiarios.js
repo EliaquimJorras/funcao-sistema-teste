@@ -11,7 +11,52 @@ $(document).ready(function () {
         $('.modal-backdrop').remove();
     });
 
-    // alterar beneficiario
+    // incluir/alterar beneficiario no javascript
+    $(document).on("click", "#incluir-button", function (e) {
+        e.preventDefault();
+
+        let cpfBeneficiario = $("#cpf-modal").val()
+        let nomeBeneficiario = $("#nome-modal").val()
+
+        if (ValidarCampos(cpfBeneficiario, nomeBeneficiario))
+            return;
+
+        let fluxoAlterar = this.baseURI.includes("Alterar");
+
+        if (ALTER_BENF_INDEX === null) {
+            let novoBeneficiario = {
+                'Id': 0,
+                'CPF': cpfBeneficiario,
+                'Nome': nomeBeneficiario,
+                'IdCliente': fluxoAlterar ? Number(this.baseURI.slice(-1)) : 0
+            }
+
+            BENEFICIARIO_LIST.push(novoBeneficiario);
+
+            if (fluxoAlterar)
+                ProcessarBeneficiario(BENEFICIARIO_LIST[BENEFICIARIO_LIST.length - 1])
+        } else {
+            const parsedList = JSON.parse(localStorage.getItem("beneficiario-list"))
+
+            BENEFICIARIO_LIST[ALTER_BENF_INDEX] = {
+                'Id': parsedList[ALTER_BENF_INDEX].Id,
+                'CPF': cpfBeneficiario,
+                'Nome': nomeBeneficiario,
+                'IdCliente': parsedList[ALTER_BENF_INDEX].IdCliente,
+            };
+
+            if (fluxoAlterar)
+                ProcessarBeneficiario(BENEFICIARIO_LIST[ALTER_BENF_INDEX])
+        }
+
+        localStorage.setItem("beneficiario-list", JSON.stringify(BENEFICIARIO_LIST));
+
+        PreencherListaBeneficiarios();
+        ResetarCamposModal();
+        ResetarVariaveisEdicao();
+    });
+
+    // preparar para alterar beneficiario no javascript
     $(document).on("click", ".alterar-button", function (e) {
         e.preventDefault();
 
@@ -30,7 +75,7 @@ $(document).ready(function () {
         }
     });
 
-    // excluir beneficiario
+    // excluir beneficiario no javascript
     $(document).on("click", ".excluir-button", function (e) {
         e.preventDefault();
 
@@ -44,7 +89,7 @@ $(document).ready(function () {
         if (isNaN(indexBeneficiario) || indexBeneficiario < 0 || indexBeneficiario >= BENEFICIARIO_LIST.length)
             return;
 
-        let beneficiarioId = BENEFICIARIO_LIST[indexBeneficiario].Id;
+        let beneficiario = BENEFICIARIO_LIST[indexBeneficiario];
 
         BENEFICIARIO_LIST.splice(indexBeneficiario, 1);
 
@@ -54,12 +99,7 @@ $(document).ready(function () {
         ResetarCamposModal();
         ResetarVariaveisEdicao();
 
-        $.ajax({
-            url: `/Cliente/ExcluirBeneficiario/${beneficiarioId}`,
-            type: 'POST',
-            contentType: "application/json; charset=utf-8",
-            success: function (response) { }
-        });
+        ExcluirBeneficiarioBanco(beneficiario.Id, beneficiario.IdCliente);
     });
 });
 
@@ -82,7 +122,6 @@ function MostrarPopUp() {
                     $('#cpf-modal').mask('000.000.000-00');
 
                     PreencherListaBeneficiarios();
-                    IncluirBeneficiario();
                 } else {
                     console.error('Erro na resposta:', response);
                 }
@@ -91,37 +130,40 @@ function MostrarPopUp() {
     });
 }
 
-function IncluirBeneficiario() {
-    $("#incluir-button").on("click", function (e) {
-        e.preventDefault();
+function ProcessarBeneficiario(beneficiario) {
+    $.ajax({
+        url: `/Cliente/ProcessarBeneficiario`,
+        type: 'POST',
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(beneficiario),
+        success: function (response) {
+            if (response.Result === "OK") {
+                ModalDialog(`Beneficiário Criado/Atualiazado`, response.Message);
 
-        let cpfBeneficiario = $("#cpf-modal").val()
-        let nomeBeneficiario = $("#nome-modal").val()
-
-        if (ValidarCampos(cpfBeneficiario, nomeBeneficiario))
-            return;
-
-        if (ALTER_BENF_INDEX === null) {
-            BENEFICIARIO_LIST.push({
-                'CPF': cpfBeneficiario,
-                'Nome': nomeBeneficiario
-            });
-        } else {
-            const parsedList = JSON.parse(localStorage.getItem("beneficiario-list"))
-
-            BENEFICIARIO_LIST[ALTER_BENF_INDEX] = {
-                'Id': parsedList[ALTER_BENF_INDEX].Id,
-                'CPF': cpfBeneficiario,
-                'Nome': nomeBeneficiario,
-                'IdCliente': parsedList[ALTER_BENF_INDEX].IdCliente,
-            };
+                localStorage.setItem("beneficiario-list", JSON.stringify(response.BeneficiarioModels));
+            }
+            else
+                ModalDialog(`Erro ao Criado/Atualiazado Beneficiário`, response.Message);
         }
+    });
+}
 
-        localStorage.setItem("beneficiario-list", JSON.stringify(BENEFICIARIO_LIST));
+function ExcluirBeneficiarioBanco(beneficiarioId, idCliente) {
+    $.ajax({
+        url: `/Cliente/ExcluirBeneficiario`,
+        type: 'POST',
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({ "Id": beneficiarioId, "IdCliente": idCliente }),
+        success: function (response) {
+            if (response.Result === "OK") {
+                ModalDialog("Beneficiário Excluído", response.Message);
 
-        PreencherListaBeneficiarios();
-        ResetarCamposModal();
-        ResetarVariaveisEdicao();
+                if (response.BeneficiarioModels)
+                    localStorage.setItem("beneficiario-list", JSON.stringify(response.BeneficiarioModels));
+            }
+            else
+                ModalDialog("Erro ao Excluir Beneficiário", response.Message);
+        }
     });
 }
 
