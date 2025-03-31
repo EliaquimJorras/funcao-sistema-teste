@@ -101,6 +101,19 @@ $(document).ready(function () {
 
         ExcluirBeneficiarioBanco(beneficiario.Id, beneficiario.IdCliente);
     });
+
+    // resetar lista beneficiario no javascript
+    $(document).on("click", "#beneficiario-modal", function (e) {
+        e.preventDefault();
+
+        const parsedList = JSON.parse(localStorage.getItem("beneficiario-list"))
+
+        if (Array.isArray(parsedList) && parsedList.length > 0)
+            BENEFICIARIO_LIST = parsedList;
+        else
+            BENEFICIARIO_LIST = []
+    });
+
 });
 
 function MostrarPopUp() {
@@ -108,7 +121,6 @@ function MostrarPopUp() {
         e.preventDefault();
 
         let url = e.currentTarget.baseURI.replace(/(Alterar|Incluir)/, "MostarBeneficiarioPopUp");
-        let lastCaracterURI = url.slice(-1)
 
         $.ajax({
             url: url,
@@ -122,6 +134,7 @@ function MostrarPopUp() {
                     $('#cpf-modal').mask('000.000.000-00');
 
                     PreencherListaBeneficiarios();
+
                 } else {
                     console.error('Erro na resposta:', response);
                 }
