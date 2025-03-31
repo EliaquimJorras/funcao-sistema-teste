@@ -220,5 +220,22 @@ namespace WebAtividadeEntrevista.Controllers
                 }
             }
         }
+
+        [HttpPost]
+        public ActionResult ExcluirBeneficiario(long id)
+        {
+            try
+            {
+                BoBeneficiario boBeneficiario = new BoBeneficiario();
+
+                boBeneficiario.Excluir(id);
+
+                return Json(new { Result = "OK", Message = "Beneficiário excluído com sucesso!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "ERROR", Message = ex.Message });
+            }
+        }
     }
 }

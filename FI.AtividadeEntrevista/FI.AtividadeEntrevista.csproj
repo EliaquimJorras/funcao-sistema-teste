@@ -46,6 +46,7 @@
     <Compile Include="BLL\BoCliente.cs" />
     <Compile Include="DAL\Beneficiarios\DaoBeneficiario.cs" />
     <Content Include="DAL\Beneficiarios\Procedures\FI_SP_AltBeneficiario.sql" />
+    <Content Include="DAL\Beneficiarios\Procedures\FI_SP_DelBeneficiario.sql" />
     <Content Include="DAL\Beneficiarios\Procedures\FI_SP_VerificaBeneficiario.sql" />
     <Compile Include="DAL\Clientes\DaoCliente.cs" />
     <Compile Include="DAL\Padrao\FI.AcessoDados.cs" />

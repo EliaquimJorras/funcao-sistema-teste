@@ -33,5 +33,12 @@ namespace FI.AtividadeEntrevista.BLL
 
             beneficiarioDao.Alterar(beneficiario);
         }
+
+        public void Excluir(long id)
+        {
+            DaoBeneficiario beneficiarioDao = new DaoBeneficiario();
+
+            beneficiarioDao.Excluir(id);
+        }
     }
 }

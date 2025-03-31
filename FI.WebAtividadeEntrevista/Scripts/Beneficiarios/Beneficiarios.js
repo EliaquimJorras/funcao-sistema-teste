@@ -39,6 +39,8 @@ $(document).ready(function () {
         if (isNaN(indexBeneficiario) || indexBeneficiario < 0 || indexBeneficiario >= BENEFICIARIO_LIST.length)
             return;
 
+        let beneficiarioId = BENEFICIARIO_LIST[indexBeneficiario].Id;
+
         BENEFICIARIO_LIST.splice(indexBeneficiario, 1);
 
         localStorage.setItem("beneficiario-list", JSON.stringify(BENEFICIARIO_LIST));
@@ -46,6 +48,13 @@ $(document).ready(function () {
         PreencherListaBeneficiarios();
         ResetarCamposModal();
         ResetarVariaveisEdicao();
+
+        $.ajax({
+            url: `/Cliente/ExcluirBeneficiario/${beneficiarioId}`,
+            type: 'POST',
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {}
+        });
     });
 });
 
