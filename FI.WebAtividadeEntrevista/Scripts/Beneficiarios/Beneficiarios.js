@@ -34,6 +34,11 @@ $(document).ready(function () {
     $(document).on("click", ".excluir-button", function (e) {
         e.preventDefault();
 
+        const confirmacao = confirm("Tem certeza de que deseja excluir este beneficiário? Este processo é irreversível.");
+
+        if (!confirmacao)
+            return;
+
         let indexBeneficiario = Number($(this).data("index"));
 
         if (isNaN(indexBeneficiario) || indexBeneficiario < 0 || indexBeneficiario >= BENEFICIARIO_LIST.length)
@@ -53,7 +58,7 @@ $(document).ready(function () {
             url: `/Cliente/ExcluirBeneficiario/${beneficiarioId}`,
             type: 'POST',
             contentType: "application/json; charset=utf-8",
-            success: function (response) {}
+            success: function (response) { }
         });
     });
 });
