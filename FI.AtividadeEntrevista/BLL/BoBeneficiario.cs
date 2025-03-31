@@ -19,5 +19,19 @@ namespace FI.AtividadeEntrevista.BLL
 
             return beneficiarioDao.ListarBeneficiarios(idCliente);
         }
+
+        public bool VerificarExistencia(string CPF)
+        {
+            DaoBeneficiario beneficiarioDao = new DaoBeneficiario();
+
+            return beneficiarioDao.VerificarExistencia(CPF);
+        }
+
+        public void Alterar(Beneficiario beneficiario)
+        {
+            DaoBeneficiario beneficiarioDao = new DaoBeneficiario();
+
+            beneficiarioDao.Alterar(beneficiario);
+        }
     }
 }

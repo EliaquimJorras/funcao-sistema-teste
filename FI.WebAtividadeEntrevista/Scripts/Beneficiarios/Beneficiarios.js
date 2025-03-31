@@ -19,12 +19,14 @@ $(document).ready(function () {
 
         let beneficiario = BENEFICIARIO_LIST[ALTER_BENF_INDEX];
 
-        $("#cpf-modal").val(beneficiario.CPF)
+        $("#cpf-modal").val(formatarCPF(beneficiario.CPF))
         $("#nome-modal").val(beneficiario.Nome)
 
         ALTER_ORIGINAL_OBJ = {
+            'Id': beneficiario.Id,
             'CPF': beneficiario.CPF,
-            'Nome': beneficiario.Nome
+            'Nome': beneficiario.Nome,
+            'IdCliente': beneficiario.IdCliente,
         }
     });
 
@@ -91,9 +93,13 @@ function IncluirBeneficiario() {
                 'Nome': nomeBeneficiario
             });
         } else {
+            const parsedList = JSON.parse(localStorage.getItem("beneficiario-list"))
+
             BENEFICIARIO_LIST[ALTER_BENF_INDEX] = {
+                'Id': parsedList[ALTER_BENF_INDEX].Id,
                 'CPF': cpfBeneficiario,
-                'Nome': nomeBeneficiario
+                'Nome': nomeBeneficiario,
+                'IdCliente': parsedList[ALTER_BENF_INDEX].IdCliente,
             };
         }
 
@@ -152,6 +158,7 @@ function ValidarCampos(cpf, nome) {
     return true;
 
 }
+
 function AdicionarLinha(beneficiario, index) {
     let novaLinha = `
         <tr>

@@ -51,5 +51,26 @@ namespace FI.AtividadeEntrevista.DAL.Beneficiarios
                 IdCliente = row.Field<long>("IdCliente")
             }).ToList();
         }
+
+        internal bool VerificarExistencia(string CPF)
+        {
+            List<SqlParameter> parametros = new List<SqlParameter> { new SqlParameter("CPF", CPF) };
+
+            DataSet ds = base.Consultar("FI_SP_VerificaBeneficiario", parametros);
+
+            return ds.Tables[0].Rows.Count > 0;
+        }
+
+        internal void Alterar(Beneficiario beneficiario)
+        {
+            List<SqlParameter> parametros = new List<SqlParameter>
+            {
+                new SqlParameter("Nome", beneficiario.Nome),
+                new SqlParameter("ID", beneficiario.Id),
+                new SqlParameter("CPF", beneficiario.CPF)
+            };
+
+            base.Executar("FI_SP_AltBeneficiario", parametros);
+        }
     }
 }

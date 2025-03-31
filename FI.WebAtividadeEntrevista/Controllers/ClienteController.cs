@@ -4,6 +4,7 @@ using FI.WebAtividadeEntrevista.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Web.Mvc;
 
 namespace WebAtividadeEntrevista.Controllers
@@ -57,22 +58,7 @@ namespace WebAtividadeEntrevista.Controllers
                     CPF = model.CPF
                 });
 
-                if (model.BeneficiarioModels?.Count > 0)
-                {
-                    BoBeneficiario boBeneficiario = new BoBeneficiario();
-
-                    foreach (BeneficiarioModel beneficiario in model.BeneficiarioModels)
-                    {
-                        if (beneficiario == null) continue;
-
-                        beneficiario.Id = boBeneficiario.Incluir(new Beneficiario()
-                        {
-                            Nome = beneficiario.Nome,
-                            CPF = beneficiario.CPF,
-                            IdCliente = model.Id
-                        });
-                    }
-                }
+                ProcessarBeneficiario(model);
 
                 return Json(new { Result = "OK", Message = "Cadastro efetuado com sucesso", BeneficiarioModels = model.BeneficiarioModels });
             }
@@ -86,42 +72,51 @@ namespace WebAtividadeEntrevista.Controllers
         [HttpPost]
         public JsonResult Alterar(ClienteModel model)
         {
-            if (!this.ModelState.IsValid)
+            try
             {
-                List<string> erros = (from item in ModelState.Values
-                                      from error in item.Errors
-                                      select error.ErrorMessage).ToList();
+                if (!this.ModelState.IsValid)
+                {
+                    List<string> erros = (from item in ModelState.Values
+                                          from error in item.Errors
+                                          select error.ErrorMessage).ToList();
 
-                Response.StatusCode = 400;
-                return Json(string.Join(Environment.NewLine, erros));
+                    Response.StatusCode = 400;
+                    return Json(string.Join(Environment.NewLine, erros));
+                }
+
+                BoCliente bo = new BoCliente();
+
+                Cliente cliente = bo.Consultar(model.Id);
+
+                if (cliente == null || (cliente.CPF != model.CPF && bo.VerificarExistencia(model.CPF)))
+                {
+                    Response.StatusCode = 400;
+                    return Json("Não foi possível alterar as informações cadastradas");
+                }
+
+                bo.Alterar(new Cliente()
+                {
+                    Id = model.Id,
+                    CEP = model.CEP,
+                    Cidade = model.Cidade,
+                    Email = model.Email,
+                    Estado = model.Estado,
+                    Logradouro = model.Logradouro,
+                    Nacionalidade = model.Nacionalidade,
+                    Nome = model.Nome,
+                    Sobrenome = model.Sobrenome,
+                    Telefone = model.Telefone,
+                    CPF = model.CPF
+                });
+
+                ProcessarBeneficiario(model, alterarCliente: true);
+
+                return Json(new { Result = "OK", Message = "Cadastro alterado com sucesso" });
             }
-
-            BoCliente bo = new BoCliente();
-
-            Cliente cliente = bo.Consultar(model.Id);
-
-            if (cliente == null || (cliente.CPF != model.CPF && bo.VerificarExistencia(model.CPF)))
+            catch (Exception ex)
             {
-                Response.StatusCode = 400;
-                return Json("Não foi possível alterar as informações cadastradas");
+                return Json(new { Result = "ERROR", Message = ex.Message });
             }
-
-            bo.Alterar(new Cliente()
-            {
-                Id = model.Id,
-                CEP = model.CEP,
-                Cidade = model.Cidade,
-                Email = model.Email,
-                Estado = model.Estado,
-                Logradouro = model.Logradouro,
-                Nacionalidade = model.Nacionalidade,
-                Nome = model.Nome,
-                Sobrenome = model.Sobrenome,
-                Telefone = model.Telefone,
-                CPF = model.CPF
-            });
-
-            return Json("Cadastro alterado com sucesso");
         }
 
         [HttpGet]
@@ -192,6 +187,38 @@ namespace WebAtividadeEntrevista.Controllers
         public ActionResult MostarBeneficiarioPopUp()
         {
             return PartialView("~/Views/Beneficiarios/BeneficiariosPopUp.cshtml");
+        }
+
+        private static void ProcessarBeneficiario(ClienteModel model, bool alterarCliente = false)
+        {
+            if (model.BeneficiarioModels == null || model.BeneficiarioModels.Count <= 0) return;
+
+            BoBeneficiario boBeneficiario = new BoBeneficiario();
+
+            foreach (BeneficiarioModel beneficiario in model.BeneficiarioModels)
+            {
+                if (beneficiario == null) continue;
+
+                if (alterarCliente && boBeneficiario.VerificarExistencia(beneficiario.CPF))
+                {
+                    boBeneficiario.Alterar(new Beneficiario()
+                    {
+                        Id = beneficiario.Id,
+                        Nome = beneficiario.Nome,
+                        CPF = beneficiario.CPF,
+                        IdCliente = model.Id
+                    });
+                }
+                else
+                {
+                    beneficiario.Id = boBeneficiario.Incluir(new Beneficiario()
+                    {
+                        Nome = beneficiario.Nome,
+                        CPF = beneficiario.CPF,
+                        IdCliente = model.Id
+                    });
+                }
+            }
         }
     }
 }
