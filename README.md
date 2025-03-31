@@ -2,4 +2,4 @@
 
 ## BANCO DE DADOS
 
-### NOTA: Será necessário rodar todas as procedures presentes na pasta DAL
+### Em caso de erro no banco de dados, será necessário rodar todos os scripts presentes na pasta DAL
